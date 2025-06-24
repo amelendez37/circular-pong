@@ -1,30 +1,41 @@
-function gameLoop(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-    requestAnimationFrame(() => gameLoop(ctx));
-}
-
 function run() {
+    function initializeCanvas() {
+        const style = getComputedStyle(canvas);
+        const cssWidth = parseFloat(style.width);
+        const cssHeight = parseFloat(style.height);
+        canvas.width = cssWidth;
+        canvas.height = cssHeight;
+    }
+
+    function drawArena() {
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 240, 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+    }
+
+    function drawPlayerOne() {
+        console.log(canvas.height)
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2 - 7, 240, 1.309, 1.8326);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
+    }
+
+    function gameLoop(ctx: CanvasRenderingContext2D) {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        requestAnimationFrame(() => gameLoop(ctx));
+    }
+
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-    // gives us methods to draw within our 2d canvas element
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-    // const dpi = window.devicePixelRatio || 1;
-    const style = getComputedStyle(canvas);
-    const cssWidth = parseFloat(style.width);
-    const cssHeight = parseFloat(style.height);
-    canvas.width = cssWidth;
-    canvas.height = cssHeight;
-
-    // // Scale context to handle drawing at higher resolution
-    // ctx.scale(dpi, dpi);
-
-    // Begin a new path
-    ctx.beginPath();
-    ctx.arc(50, 50, 20, 0, Math.PI * 2);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'black';
-    ctx.stroke(); // Outline the circle
+    initializeCanvas();
+    drawArena();
+    drawPlayerOne();
 
     // gameLoop(ctx);
 }
