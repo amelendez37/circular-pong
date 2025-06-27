@@ -7,7 +7,7 @@ function run() {
         canvas.height = cssHeight;
     }
 
-    function drawArena() {
+    function Arena() {
         ctx.beginPath();
         ctx.arc(canvas.width / 2, canvas.height / 2, 240, 0, Math.PI * 2);
         ctx.lineWidth = 2;
@@ -15,13 +15,27 @@ function run() {
         ctx.stroke();
     }
 
-    function drawPlayerOne() {
-        console.log(canvas.height)
+    function PlayerOne() {
+        // draw
         ctx.beginPath();
         ctx.arc(canvas.width / 2, canvas.height / 2 - 7, 240, 1.309, 1.8326); // x, y, radius, 75deg, 105deg
         ctx.lineWidth = 6;
         ctx.strokeStyle = 'green';
         ctx.stroke();
+
+        // bind movements
+        document.addEventListener('keydown', (e) => {
+            console.log('press: ', e.key);
+        });
+
+        return {
+            movingLeft: false,
+            movingRight: false,
+        };
+    }
+
+    function GameState() {
+        return {};
     }
 
     function gameLoop(ctx: CanvasRenderingContext2D) {
@@ -34,8 +48,9 @@ function run() {
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
     initializeCanvas();
-    drawArena();
-    drawPlayerOne();
+    Arena();
+    const gameState = GameState();
+    const playerOne = PlayerOne();
 
     // gameLoop(ctx);
 }
