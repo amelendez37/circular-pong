@@ -24,7 +24,6 @@ function run() {
         let isMovingRight = false;
 
         const draw = function () {
-            debugger;
             ctx.beginPath();
             ctx.arc(x, y, 240, 1.309, 1.8326); // x, y, radius, 75deg, 105deg
             ctx.lineWidth = 6;
