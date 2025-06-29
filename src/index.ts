@@ -35,7 +35,7 @@ function run() {
         let y = initialY;
         let direction = 0;
         const angleDelta = 0.5236;
-        const updateDelta = 0.0872665;
+        const updateDelta = 0.0349066;
 
         let startAngle = 1.309;
         let endAngle = startAngle + angleDelta;
@@ -54,6 +54,7 @@ function run() {
             endAngle = startAngle + angleDelta;
         }
 
+        // TODO: when you switch directions quickly direction is getting set to 0 briefly due to keyup event which is causing stutter of movement 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') {
                 direction = -1;
