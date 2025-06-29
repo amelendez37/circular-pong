@@ -1,4 +1,4 @@
-import { Player } from './models';
+import { Player, GameState, Arena } from './models';
 
 function run() {
     function initializeCanvas() {
@@ -9,23 +9,40 @@ function run() {
         canvas.height = cssHeight;
     }
 
-    function drawArena() {
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 240, 0, Math.PI * 2);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'black';
-        ctx.stroke();
+    function arena(): Arena {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const radius = 240;
+
+        const draw = () => {
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+        };
+
+        return {
+            cx,
+            cy,
+            radius,
+            draw,
+        };
     }
 
     function player(initialX: number, initialY: number): Player {
         let x = initialX;
         let y = initialY;
-        let isMovingLeft = false;
-        let isMovingRight = false;
+        let direction = 0;
+        const angleDelta = 0.5236;
+        const updateDelta = 0.0872665;
 
-        const draw = function () {
+        let startAngle = 1.309;
+        let endAngle = startAngle + angleDelta;
+
+        const draw = function (gameState: GameState) {
             ctx.beginPath();
-            ctx.arc(x, y, 240, 1.309, 1.8326); // x, y, radius, 75deg, 105deg
+            ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
             ctx.lineWidth = 6;
             ctx.strokeStyle = 'green';
             ctx.stroke();
@@ -33,27 +50,20 @@ function run() {
 
         const updatePosition = function () {
             // need to move x and y in a way that is consistent with circle boundaries
-            if (isMovingLeft) {
-                x -= 1;
-            } else if (isMovingRight) {
-                x += 1;
-            }
+            startAngle += updateDelta * direction;
+            endAngle = startAngle + angleDelta;
         }
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') {
-                isMovingRight = true;
-                isMovingLeft = false;
+                direction = -1;
             } else if (e.key === 'ArrowLeft') {
-                isMovingLeft = true;
-                isMovingRight = false;
+                direction = 1;
             }
         });
         document.addEventListener('keyup', function (e) {
-            if (e.key === 'ArrowRight') {
-                isMovingRight = false;
-            } else if (e.key === 'ArrowLeft') {
-                isMovingLeft = false;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                direction = 0;
             }
         })
 
@@ -65,18 +75,20 @@ function run() {
         };
     }
 
-    function gameState(p1: Player) {
+    function gameState(arena: any, p1: Player) {
         return {
-            p1
+            arena,
+            p1,
         };
     }
 
-    function gameLoop(ctx: CanvasRenderingContext2D, gameStateInstance: any) {
+    function gameLoop(ctx: CanvasRenderingContext2D, gameStateInstance: GameState) {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-        drawArena();
+        const arenaInstance = arena();
         const { p1 } = gameStateInstance;
-        p1.draw();
+        arenaInstance.draw();
+        p1.draw(gameStateInstance);
         p1.updatePosition();
 
         requestAnimationFrame(() => gameLoop(ctx, gameStateInstance));
@@ -86,10 +98,14 @@ function run() {
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
     initializeCanvas();
-    drawArena();
-    const p1 = player(canvas.width / 2, canvas.height / 2 - 7);
-    p1.draw();
-    const gameStateInstance = gameState(p1);
+
+    const arenaInstance = arena();
+    arenaInstance.draw();
+
+    const p1 = player(canvas.width / 2, canvas.height / 2);
+
+    const gameStateInstance = gameState(arenaInstance, p1);
+    p1.draw(gameStateInstance);
 
     gameLoop(ctx, gameStateInstance);
 }
