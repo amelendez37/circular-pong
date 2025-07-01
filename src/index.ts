@@ -34,6 +34,8 @@ function run() {
         let x = initialX;
         let y = initialY;
         let direction = 0;
+        let isRightDown = false;
+        let isLeftDown = false;
         const angleDelta = 0.5236;
         const updateDelta = 0.0349066;
 
@@ -49,21 +51,28 @@ function run() {
         };
 
         const updatePosition = function () {
-            // need to move x and y in a way that is consistent with circle boundaries
             startAngle += updateDelta * direction;
             endAngle = startAngle + angleDelta;
         }
 
-        // TODO: when you switch directions quickly direction is getting set to 0 briefly due to keyup event which is causing stutter of movement 
+        // TODO: when you switch directions quickly, direction is getting set to 0 briefly due to keyup event which is causing stutter of movement 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') {
                 direction = -1;
+                isRightDown = true;
             } else if (e.key === 'ArrowLeft') {
                 direction = 1;
+                isLeftDown = true;
             }
         });
         document.addEventListener('keyup', function (e) {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            if (e.key === 'ArrowRight') {
+                isRightDown = false;
+                if (isLeftDown) return;
+                direction = 0;
+            } else if (e.key === 'ArrowLeft') {
+                isLeftDown = false;
+                if (isRightDown) return;
                 direction = 0;
             }
         })
