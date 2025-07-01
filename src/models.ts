@@ -16,3 +16,8 @@ export interface Arena {
   radius: number;
   draw: () => void;
 }
+
+export interface Coord {
+  x: number;
+  y: number;
+}

@@ -1,4 +1,6 @@
-import { Player, GameState, Arena } from './models';
+import { Player, GameState, Arena, Coord } from './models';
+
+const lineWidth = 2;
 
 function run() {
     function initializeCanvas() {
@@ -9,17 +11,31 @@ function run() {
         canvas.height = cssHeight;
     }
 
+    function drawLine(from: Coord, to: Coord) {
+        ctx.beginPath();
+        ctx.moveTo(from.x, to.x);
+        ctx.lineTo(to.x, to.y);
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+    }
+
     function arena(): Arena {
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
         const radius = 240;
 
         const draw = () => {
+            // draw arena circle
             ctx.beginPath();
             ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.lineWidth = 2;
+            ctx.lineWidth = lineWidth;
             ctx.strokeStyle = 'black';
             ctx.stroke();
+
+            // draw movement boundaries
+            // todo: fix these boundary lines
+            drawLine({ x: cx + radius - 5, y: cy }, { x: cx + radius + 5, y: cy });
+            // drawLine({ x: cx - radius - 5, y: cy }, { x: cx - radius + 5, y: cy });
         };
 
         return {
@@ -55,7 +71,6 @@ function run() {
             endAngle = startAngle + angleDelta;
         }
 
-        // TODO: when you switch directions quickly, direction is getting set to 0 briefly due to keyup event which is causing stutter of movement 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') {
                 direction = -1;
