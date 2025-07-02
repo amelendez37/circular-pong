@@ -13,7 +13,7 @@ function run() {
 
     function drawLine(from: Coord, to: Coord) {
         ctx.beginPath();
-        ctx.moveTo(from.x, to.x);
+        ctx.moveTo(from.x, to.y);
         ctx.lineTo(to.x, to.y);
         ctx.lineWidth = lineWidth;
         ctx.stroke();
@@ -34,8 +34,8 @@ function run() {
 
             // draw movement boundaries
             // todo: fix these boundary lines
-            drawLine({ x: cx + radius - 5, y: cy }, { x: cx + radius + 5, y: cy });
-            // drawLine({ x: cx - radius - 5, y: cy }, { x: cx - radius + 5, y: cy });
+            drawLine({ x: cx + radius - 7, y: cy }, { x: cx + radius + 7, y: cy });
+            drawLine({ x: cx - radius - 7, y: cy }, { x: cx - radius + 7, y: cy });
         };
 
         return {
@@ -67,8 +67,12 @@ function run() {
         };
 
         const updatePosition = function () {
+            let updatedEndAngle = startAngle + angleDelta;
+            if (startAngle <= 0 && direction == -1) return;
+            if (updatedEndAngle >= Math.PI && direction == 1) return;
+
             startAngle += updateDelta * direction;
-            endAngle = startAngle + angleDelta;
+            endAngle = updatedEndAngle;
         }
 
         document.addEventListener('keydown', function (e) {
