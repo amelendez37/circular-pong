@@ -34,8 +34,8 @@ function run() {
 
             // draw movement boundaries
             // todo: fix these boundary lines
-            drawLine({ x: cx + radius - 7, y: cy }, { x: cx + radius + 7, y: cy });
-            drawLine({ x: cx - radius - 7, y: cy }, { x: cx - radius + 7, y: cy });
+            drawLine({ x: cx - radius, y: cy }, { x: cx + radius, y: cy });
+            // drawLine({ x: cx - radius - 10, y: cy }, { x: cx - radius + 10, y: cy });
         };
 
         return {
@@ -52,8 +52,9 @@ function run() {
         let direction = 0;
         let isRightDown = false;
         let isLeftDown = false;
-        const angleDelta = 0.5236;
-        const updateDelta = 0.0349066;
+        const angleDelta = 0.5;
+        const updateDelta = 0.02;
+        // const updateDelta = 0.001;
 
         let startAngle = 1.309;
         let endAngle = startAngle + angleDelta;
@@ -67,12 +68,15 @@ function run() {
         };
 
         const updatePosition = function () {
-            let updatedEndAngle = startAngle + angleDelta;
-            if (startAngle <= 0 && direction == -1) return;
-            if (updatedEndAngle >= Math.PI && direction == 1) return;
+            const nextStartAngle = startAngle + updateDelta * direction;
+            const nextEndAngle = startAngle + angleDelta;
 
-            startAngle += updateDelta * direction;
-            endAngle = updatedEndAngle;
+            if (nextStartAngle <= 0 && direction == -1) return;
+            if (nextEndAngle >= Math.PI && direction == 1) return;
+            if (direction == 0) return;
+
+            startAngle = nextStartAngle;
+            endAngle = nextEndAngle;
         }
 
         document.addEventListener('keydown', function (e) {
