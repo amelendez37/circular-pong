@@ -1,14 +1,20 @@
 export interface Player {
   x: number,
   y: number,
-  draw: (gameState: GameState) => void;
+  draw: () => void;
   updatePosition: () => void;
 }
 
 export interface GameState {
-  arena: Arena;
+  getState: () => StateOfGame;
+  setState: (x: StateOfGame) => void;
+}
+
+export interface StateOfGame {
   p1: Player;
   p2: Player;
+  gameBall: GameBall;
+  arena: Arena;
 }
 
 export interface Arena {
@@ -16,6 +22,13 @@ export interface Arena {
   cy: number;
   radius: number;
   draw: () => void;
+}
+
+export interface GameBall {
+  // x: number,
+  // y: number,
+  draw: (gameState: GameState) => void;
+  // updatePosition: () => void;
 }
 
 export interface Coord {

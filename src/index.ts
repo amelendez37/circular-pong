@@ -1,8 +1,32 @@
-import { Player, GameState, Arena, Coord } from './models';
+import { Player, GameState, StateOfGame, Arena, GameBall, Coord } from './models';
 
 const lineWidth = 2;
 
 function run() {
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    initializeCanvas();
+    const gameStateInstance = gameState();
+    const arenaInstance = arena();
+    const p1 = player(1);
+    const p2 = player(2);
+    const gameBall = ball();
+    gameStateInstance.setState({
+        arena: arenaInstance,
+        p1,
+        p2,
+        gameBall,
+    });
+
+    p1.draw();
+    p2.draw();
+    gameBall.draw();
+    arenaInstance.draw();
+
+    gameLoop();
+
+    // DECLARATIONS START
     function initializeCanvas() {
         const style = getComputedStyle(canvas);
         const cssWidth = parseFloat(style.width);
@@ -59,22 +83,23 @@ function run() {
         let endAngle = startAngle + angleDelta;
 
         // draw player
-        const draw = function (gameState: GameState) {
+        const draw = function () {
             if (!playerNumber) return;
 
+            const { arena } = gameStateInstance.getState();
             if (playerNumber == 1) {
                 ctx.beginPath();
-                ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
+                ctx.arc(x, y, arena.radius - 7, startAngle, endAngle);
                 ctx.lineWidth = 6;
-                ctx.strokeStyle = 'green';
+                ctx.strokeStyle = '#75a743';
                 ctx.stroke();
             }
 
             if (playerNumber == 2) {
                 ctx.beginPath();
-                ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
+                ctx.arc(x, y, arena.radius - 7, startAngle, endAngle);
                 ctx.lineWidth = 6;
-                ctx.strokeStyle = 'red';
+                ctx.strokeStyle = '#75a743';
                 ctx.stroke();
             }
         };
@@ -155,44 +180,59 @@ function run() {
         };
     }
 
-    function gameState(arena: any, p1: Player, p2: Player) {
+    function ball() {
+        const defaultRadius = 10;
+
+        function draw() {
+            const { p1, p2 } = gameStateInstance.getState();
+            const x = p1.x;
+            const y = p1.y;
+
+            ctx.beginPath();
+            ctx.arc(x, y, defaultRadius, 0, Math.PI * 2);
+            ctx.lineWidth = 6;
+            // ctx.strokeStyle = '#25562e';
+            ctx.strokeStyle = 'red';
+            ctx.fill();
+            ctx.stroke();
+        }
+
         return {
-            arena,
-            p1,
-            p2,
-        };
+            draw,
+        }
     }
 
-    function gameLoop(ctx: CanvasRenderingContext2D, gameStateInstance: GameState) {
+    function gameState() {
+        let currentState: StateOfGame;
+
+        function setState(state: StateOfGame) {
+            currentState = state;
+        }
+
+        function getState() {
+            return currentState;
+        }
+
+        return {
+            setState,
+            getState,
+        }
+    }
+
+    function gameLoop() {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-        const arenaInstance = arena();
-        const { p1, p2 } = gameStateInstance;
+        // const arenaInstance = arena();
+        // const { p1, p2, gameBall } = gameStateInstance.getState();
         arenaInstance.draw();
-        p1.draw(gameStateInstance);
+        p1.draw();
         p1.updatePosition();
-        p2.draw(gameStateInstance);
+        p2.draw();
         p2.updatePosition();
+        gameBall.draw();
 
-        requestAnimationFrame(() => gameLoop(ctx, gameStateInstance));
+        requestAnimationFrame(gameLoop);
     }
-
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
-    initializeCanvas();
-
-    const arenaInstance = arena();
-    arenaInstance.draw();
-
-    const p1 = player(1);
-    const p2 = player(2);
-
-    const gameStateInstance = gameState(arenaInstance, p1, p2);
-    p1.draw(gameStateInstance);
-    p2.draw(gameStateInstance);
-
-    gameLoop(ctx, gameStateInstance);
 }
 
 run();
