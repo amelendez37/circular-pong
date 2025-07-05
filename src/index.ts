@@ -32,10 +32,8 @@ function run() {
             ctx.strokeStyle = 'black';
             ctx.stroke();
 
-            // draw movement boundaries
-            // todo: fix these boundary lines
+            // draw movement boundary
             drawLine({ x: cx - radius, y: cy }, { x: cx + radius, y: cy });
-            // drawLine({ x: cx - radius - 10, y: cy }, { x: cx - radius + 10, y: cy });
         };
 
         return {
@@ -46,57 +44,106 @@ function run() {
         };
     }
 
-    function player(initialX: number, initialY: number): Player {
-        let x = initialX;
-        let y = initialY;
+    function player(playerNumber: number): Player {
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
         let direction = 0;
         let isRightDown = false;
         let isLeftDown = false;
         const angleDelta = 0.5;
         const updateDelta = 0.02;
-        // const updateDelta = 0.001;
 
-        let startAngle = 1.309;
+        const degrees75 = 5 * Math.PI / 12;
+        const degrees255 = 17 * Math.PI / 12;
+        let startAngle = playerNumber == 1 ? degrees75 : degrees255;
         let endAngle = startAngle + angleDelta;
 
+        // draw player
         const draw = function (gameState: GameState) {
-            ctx.beginPath();
-            ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
-            ctx.lineWidth = 6;
-            ctx.strokeStyle = 'green';
-            ctx.stroke();
+            if (!playerNumber) return;
+
+            if (playerNumber == 1) {
+                ctx.beginPath();
+                ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = 'green';
+                ctx.stroke();
+            }
+
+            if (playerNumber == 2) {
+                ctx.beginPath();
+                ctx.arc(x, y, gameState.arena.radius - 7, startAngle, endAngle); // x, y, radius, 75deg, 105deg
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = 'red';
+                ctx.stroke();
+            }
         };
 
+        // update player position
         const updatePosition = function () {
             const nextStartAngle = startAngle + updateDelta * direction;
             const nextEndAngle = startAngle + angleDelta;
 
-            if (nextStartAngle <= 0 && direction == -1) return;
-            if (nextEndAngle >= Math.PI && direction == 1) return;
-            if (direction == 0) return;
+            if (playerNumber == 1) {
+                if (nextStartAngle <= 0 && direction == -1) return;
+                if (nextEndAngle >= Math.PI && direction == 1) return;
+                if (direction == 0) return;
+            }
+
+            if (playerNumber == 2) {
+                if (nextEndAngle >= 2 * Math.PI && direction == 1) return;
+                if (nextStartAngle <= Math.PI && direction == -1) return;
+                if (direction == 0) return;
+            }
 
             startAngle = nextStartAngle;
             endAngle = nextEndAngle;
         }
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowRight') {
-                direction = -1;
-                isRightDown = true;
-            } else if (e.key === 'ArrowLeft') {
-                direction = 1;
-                isLeftDown = true;
+            if (playerNumber == 1) {
+                if (e.key === 'ArrowRight') {
+                    direction = -1;
+                    isRightDown = true;
+                } else if (e.key === 'ArrowLeft') {
+                    direction = 1;
+                    isLeftDown = true;
+                }
+            }
+
+            if (playerNumber == 2) {
+                if (e.key === 'd') {
+                    direction = 1;
+                    isRightDown = true;
+                } else if (e.key === 'a') {
+                    direction = -1;
+                    isLeftDown = true;
+                }
             }
         });
         document.addEventListener('keyup', function (e) {
-            if (e.key === 'ArrowRight') {
-                isRightDown = false;
-                if (isLeftDown) return;
-                direction = 0;
-            } else if (e.key === 'ArrowLeft') {
-                isLeftDown = false;
-                if (isRightDown) return;
-                direction = 0;
+            if (playerNumber == 1) {
+                if (e.key === 'ArrowRight') {
+                    isRightDown = false;
+                    if (isLeftDown) return;
+                    direction = 0;
+                } else if (e.key === 'ArrowLeft') {
+                    isLeftDown = false;
+                    if (isRightDown) return;
+                    direction = 0;
+                }
+            }
+
+            if (playerNumber == 2) {
+                if (e.key === 'd') {
+                    isRightDown = false;
+                    if (isLeftDown) return;
+                    direction = 0;
+                } else if (e.key === 'a') {
+                    isLeftDown = false;
+                    if (isRightDown) return;
+                    direction = 0;
+                }
             }
         })
 
@@ -108,10 +155,11 @@ function run() {
         };
     }
 
-    function gameState(arena: any, p1: Player) {
+    function gameState(arena: any, p1: Player, p2: Player) {
         return {
             arena,
             p1,
+            p2,
         };
     }
 
@@ -119,10 +167,12 @@ function run() {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
         const arenaInstance = arena();
-        const { p1 } = gameStateInstance;
+        const { p1, p2 } = gameStateInstance;
         arenaInstance.draw();
         p1.draw(gameStateInstance);
         p1.updatePosition();
+        p2.draw(gameStateInstance);
+        p2.updatePosition();
 
         requestAnimationFrame(() => gameLoop(ctx, gameStateInstance));
     }
@@ -135,10 +185,12 @@ function run() {
     const arenaInstance = arena();
     arenaInstance.draw();
 
-    const p1 = player(canvas.width / 2, canvas.height / 2);
+    const p1 = player(1);
+    const p2 = player(2);
 
-    const gameStateInstance = gameState(arenaInstance, p1);
+    const gameStateInstance = gameState(arenaInstance, p1, p2);
     p1.draw(gameStateInstance);
+    p2.draw(gameStateInstance);
 
     gameLoop(ctx, gameStateInstance);
 }

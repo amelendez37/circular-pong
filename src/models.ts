@@ -8,6 +8,7 @@ export interface Player {
 export interface GameState {
   arena: Arena;
   p1: Player;
+  p2: Player;
 }
 
 export interface Arena {
