@@ -17,6 +17,9 @@ function run() {
         p1,
         p2,
         gameBall,
+        state: {
+            hasServed: false
+        },
     });
 
     p1.draw();
@@ -193,12 +196,14 @@ function run() {
 
     function ball() {
         const defaultRadius = 8;
+        let x;
+        let y;
 
         function draw() {
             const { p1, p2 } = gameStateInstance.getState();
             const { x: p1x, y: p1y, radius: playerRadius, lineWidth } = p1.getPlayerLoc();
-            const x = p1x;
-            const y = p1y + playerRadius - defaultRadius - lineWidth;
+            x = p1x;
+            y = p1y + playerRadius - defaultRadius - lineWidth;
 
             ctx.beginPath();
             ctx.arc(x, y, defaultRadius, 0, Math.PI * 2);
@@ -209,8 +214,16 @@ function run() {
             ctx.stroke();
         }
 
+        function updatePosition() {
+            const { state } = gameStateInstance.getState();
+            if (!state.hasServed) {
+                // todo: stick to player
+            }
+        }
+
         return {
             draw,
+            updatePosition,
         }
     }
 

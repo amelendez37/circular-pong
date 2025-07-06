@@ -14,6 +14,9 @@ export interface StateOfGame {
   p2: Player;
   gameBall: GameBall;
   arena: Arena;
+  state: {
+    hasServed: boolean;
+  }
 }
 
 export interface Arena {
@@ -27,7 +30,7 @@ export interface GameBall {
   // x: number,
   // y: number,
   draw: (gameState: GameState) => void;
-  // updatePosition: () => void;
+  updatePosition: () => void;
   // score
   // who serves next
 }
