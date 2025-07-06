@@ -1,6 +1,5 @@
 export interface Player {
-  x: number,
-  y: number,
+  getPlayerLoc: () => PlayerLocation;
   draw: () => void;
   updatePosition: () => void;
 }
@@ -29,9 +28,18 @@ export interface GameBall {
   // y: number,
   draw: (gameState: GameState) => void;
   // updatePosition: () => void;
+  // score
+  // who serves next
 }
 
 export interface Coord {
   x: number;
   y: number;
+}
+
+export interface PlayerLocation {
+  x: number,
+  y: number,
+  radius: number;
+  lineWidth: number;
 }

@@ -1,4 +1,4 @@
-import { Player, GameState, StateOfGame, Arena, GameBall, Coord } from './models';
+import { Player, GameState, StateOfGame, Arena, GameBall, Coord, PlayerLocation } from './models';
 
 const lineWidth = 2;
 
@@ -74,35 +74,47 @@ function run() {
         let direction = 0;
         let isRightDown = false;
         let isLeftDown = false;
+        let playerRadius = 0; // to determine where player will actually be on the circle
         const angleDelta = 0.5;
         const updateDelta = 0.02;
-
         const degrees75 = 5 * Math.PI / 12;
         const degrees255 = 17 * Math.PI / 12;
+        const playerLineWidth = 6;
         let startAngle = playerNumber == 1 ? degrees75 : degrees255;
         let endAngle = startAngle + angleDelta;
 
         // draw player
         const draw = function () {
+            const { arena } = gameStateInstance.getState();
+            playerRadius = arena.radius - 7;
+
             if (!playerNumber) return;
 
-            const { arena } = gameStateInstance.getState();
             if (playerNumber == 1) {
                 ctx.beginPath();
-                ctx.arc(x, y, arena.radius - 7, startAngle, endAngle);
-                ctx.lineWidth = 6;
+                ctx.arc(x, y, playerRadius, startAngle, endAngle);
+                ctx.lineWidth = playerLineWidth;
                 ctx.strokeStyle = '#75a743';
                 ctx.stroke();
             }
 
             if (playerNumber == 2) {
                 ctx.beginPath();
-                ctx.arc(x, y, arena.radius - 7, startAngle, endAngle);
-                ctx.lineWidth = 6;
+                ctx.arc(x, y, playerRadius, startAngle, endAngle);
+                ctx.lineWidth = playerLineWidth;
                 ctx.strokeStyle = '#75a743';
                 ctx.stroke();
             }
         };
+
+        const getPlayerLoc = function (): PlayerLocation {
+            return {
+                x,
+                y,
+                radius: playerRadius,
+                lineWidth,
+            }
+        }
 
         // update player position
         const updatePosition = function () {
@@ -173,26 +185,26 @@ function run() {
         })
 
         return {
-            x,
-            y,
+            getPlayerLoc,
             draw,
             updatePosition,
         };
     }
 
     function ball() {
-        const defaultRadius = 10;
+        const defaultRadius = 8;
 
         function draw() {
             const { p1, p2 } = gameStateInstance.getState();
-            const x = p1.x;
-            const y = p1.y;
+            const { x: p1x, y: p1y, radius: playerRadius, lineWidth } = p1.getPlayerLoc();
+            const x = p1x;
+            const y = p1y + playerRadius - defaultRadius - lineWidth;
 
             ctx.beginPath();
             ctx.arc(x, y, defaultRadius, 0, Math.PI * 2);
-            ctx.lineWidth = 6;
-            // ctx.strokeStyle = '#25562e';
+            ctx.lineWidth = 1;
             ctx.strokeStyle = 'red';
+            ctx.fillStyle = 'red';
             ctx.fill();
             ctx.stroke();
         }
