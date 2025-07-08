@@ -72,8 +72,8 @@ function run() {
     }
 
     function player(playerNumber: number): Player {
-        let x = canvas.width / 2;
-        let y = canvas.height / 2;
+        let cx = canvas.width / 2;
+        let cy = canvas.height / 2;
         let direction = 0;
         let isRightDown = false;
         let isLeftDown = false;
@@ -95,7 +95,7 @@ function run() {
 
             if (playerNumber == 1) {
                 ctx.beginPath();
-                ctx.arc(x, y, playerRadius, startAngle, endAngle);
+                ctx.arc(cx, cy, playerRadius, startAngle, endAngle);
                 ctx.lineWidth = playerLineWidth;
                 ctx.strokeStyle = '#75a743';
                 ctx.stroke();
@@ -103,7 +103,7 @@ function run() {
 
             if (playerNumber == 2) {
                 ctx.beginPath();
-                ctx.arc(x, y, playerRadius, startAngle, endAngle);
+                ctx.arc(cx, cy, playerRadius, startAngle, endAngle);
                 ctx.lineWidth = playerLineWidth;
                 ctx.strokeStyle = '#75a743';
                 ctx.stroke();
@@ -112,8 +112,10 @@ function run() {
 
         const getPlayerLoc = function (): PlayerLocation {
             return {
-                x,
-                y,
+                cx,
+                cy,
+                x: 1, // todo: get meaningful coordinates of player/hitboxes
+                y: 1,
                 radius: playerRadius,
                 lineWidth,
             }
@@ -201,9 +203,9 @@ function run() {
 
         function draw() {
             const { p1, p2 } = gameStateInstance.getState();
-            const { x: p1x, y: p1y, radius: playerRadius, lineWidth } = p1.getPlayerLoc();
-            x = p1x;
-            y = p1y + playerRadius - defaultRadius - lineWidth;
+            const { cx: p1cx, cy: p1cy, radius: playerRadius, lineWidth } = p1.getPlayerLoc();
+            x = p1cx;
+            y = p1cy + playerRadius - defaultRadius - lineWidth;
 
             ctx.beginPath();
             ctx.arc(x, y, defaultRadius, 0, Math.PI * 2);
@@ -219,6 +221,8 @@ function run() {
             if (!state.hasServed) {
                 // todo: stick to player
             }
+
+            // else check for collisions and update position of ball
         }
 
         return {

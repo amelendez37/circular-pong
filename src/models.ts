@@ -41,8 +41,10 @@ export interface Coord {
 }
 
 export interface PlayerLocation {
-  x: number,
-  y: number,
+  cx: number,
+  cy: number,
+  x: number, // of character paddel
+  y: number, // of character paddel
   radius: number;
   lineWidth: number;
 }
